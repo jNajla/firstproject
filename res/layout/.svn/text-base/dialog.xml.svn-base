@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="200dp"
+    android:layout_gravity="center"
+    android:background="@drawable/bgdialog"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/buttonquitter"
+        android:layout_width="22dp"
+        android:layout_height="29dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/buttonprive"
+        android:background="@drawable/close" />
+
+    <Button
+        android:id="@+id/buttonprive"
+        android:layout_width="136dp"
+        android:layout_height="48dp"
+        android:layout_alignBottom="@+id/btnpublique"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/btnpublique"
+        android:background="@drawable/pointprive"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/buttonquitter"
+        android:layout_alignBottom="@+id/buttonquitter"
+        android:layout_alignParentLeft="true"
+        android:text="Ajouter des points d&apos;interet:"
+        android:textColor="#6A1500"
+        android:textSize="14dp" />
+
+    <Button
+        android:id="@+id/btnpublique"
+        android:layout_width="136dp"
+        android:layout_height="48dp"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_below="@+id/buttonquitter"
+        android:layout_marginTop="47dp"
+        android:background="@drawable/pointpublique"
+        android:gravity="center" />
+
+</RelativeLayout>

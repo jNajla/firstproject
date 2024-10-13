@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">appayn</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+	<color name="orange">#ED6B15</color>
+	<string name="mes_points_prive">mes points prive</string>
+	<string name="quoi_">quoi?</string>
+	<string name="ajouter_un_point_publique">ajouter un point publique</string>
+	<string name="nom">nom</string>
+	<string name="site_web">site_web</string>
+	<string name="telephone">telephone</string>
+	<string name="_0">0</string>
+	<string name="description">description</string>
+	<string name="fax_">fax_</string>
+	<string name="vide">champ obligatoire</string>
+	
+</resources>

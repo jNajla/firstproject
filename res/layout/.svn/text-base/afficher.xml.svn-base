@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background2" >
+
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/background1"
+    android:orientation="horizontal" >
+
+<TextView
+    
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Afficher les points d'interet"
+    android:textSize="14sp"
+    android:layout_marginTop="5dp"
+    android:textColor="#F7F9F8"
+   
+    >
+    
+</TextView>
+    <Button
+        android:id="@+id/btnquitter"
+        android:layout_width="27dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/close" />
+
+</RelativeLayout>
+
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="43dp"
+    android:background="@drawable/background2"
+    android:orientation="horizontal" >
+
+    <EditText
+        android:id="@+id/TextView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/chercher"
+        android:background="@android:color/white"
+        android:layout_marginTop="10dp"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/chercher"
+        android:layout_width="35dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+         android:layout_marginRight="5dp"
+         android:layout_marginLeft="9dp"
+         android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/btnsearch" />
+
+</RelativeLayout>
+ 
+<RelativeLayout 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/background2" >
+
+    <ListView
+        android:id="@+id/ListView01"
+        android:layout_width="fill_parent"
+        android:layout_height="427dp" >
+
+    </ListView>
+</RelativeLayout>
+</LinearLayout>

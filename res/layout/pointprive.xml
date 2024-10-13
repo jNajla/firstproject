@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/background2"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/background1"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajouter un point prive"
+            android:textColor="#F7F9F8"
+            android:textSize="14sp" 
+            android:layout_marginTop="5dp">
+        </TextView>
+
+        <Button
+            android:id="@+id/btnquitter"
+            android:layout_width="27dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/close" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/nompt"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="52dp"
+        android:text=" Nom"
+        android:textColor="#ED6B15"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/editnom"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignBaseline="@+id/nompt"
+        android:layout_alignBottom="@+id/nompt"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/btnposition"
+        android:layout_width="106dp"
+        android:layout_height="62dp"
+        android:layout_below="@+id/editnom"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/ajouterposition" />
+
+</RelativeLayout>

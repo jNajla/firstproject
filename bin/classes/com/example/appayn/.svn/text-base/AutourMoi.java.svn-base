@@ -1,0 +1,279 @@
+package com.example.appayn;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Window;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
+public class AutourMoi extends Activity implements LocationListener, OnMarkerClickListener {
+    private GoogleMap gMap;
+    
+    double latitude, longitude;
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 0 meters
+    
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 0;// 1000 * 0 * 1; // 1 minute
+    Location location;
+    LocationManager locationManager;
+    boolean loc = false;
+    ProgressDialog myPd_ring;
+    Marker marker;
+    LatLng maposition;
+    MapManager mm;
+    List<LatLng> listePOI;
+    LatLng center;
+    
+    @SuppressLint("NewApi")
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.map_activity);
+        if (startGPS()) {
+            // recevoir la position
+            final Bundle bundle = getIntent().getExtras();
+            loc = bundle.getBoolean("startSearching");
+            // progress bar : attend la reception des pois
+            myPd_ring = ProgressDialog.show(AutourMoi.this, "Recherche de votre position",
+                                            "veuillez attendre la reception de votre position..", true);
+            myPd_ring.setCancelable(true);
+            // myPd_ring.setCanceledOnTouchOutside(false);
+            
+        }
+        gMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        
+        if (gMap == null) {
+            Log.v("test", "map null");
+        }
+        // final LatLng tunis = new LatLng(36.81808, 10.165733);
+        // gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tunis, 16));
+        
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final Location lastpos = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (lastpos != null) {
+            center = new LatLng(lastpos.getLatitude(), lastpos.getLongitude());
+        } else {
+            Log.v("test", "toto");
+            center = new LatLng(36.81808, 10.165733);
+        }
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 10));
+        /*  // recevoir la position
+          final Bundle bundle = getIntent().getExtras();
+          loc = bundle.getBoolean("startSearching");
+          // progress bar : attend la reception des pois
+          myPd_ring = ProgressDialog.show(AutourMoi.this, "Recherche de votre position",
+                                          "veuillez attendre la reception de votre position..", true);
+          myPd_ring.setCancelable(true);
+          // myPd_ring.setCanceledOnTouchOutside(false);*/
+        gMap.setOnMarkerClickListener(this);
+        
+        mm = new MapManager();
+    }
+    
+    // gps
+    private boolean startGPS() {
+        
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        // si le gps est active
+        if (enabled) {
+            if (location == null) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                                                       MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Log.v("test", " GPS updating ...");
+                
+            }
+            final boolean enabled2 = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if (enabled2) {
+                if (location == null) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                                                           MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.v("test", " Network updating ...");
+                }
+            }
+            return true;
+        } else {
+            /* Alert Dialog Code Start*/
+            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("Start GPS"); // Set Alert dialog title here
+            alert.setMessage("Le GPS est desactive!! Voulez vous l'activer?"); // Message here
+            
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int whichButton) {
+                    
+                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    
+                }
+            });
+            
+            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int whichButton) {
+                    
+                    // Canceled.
+                    dialog.cancel();
+                    
+                }
+            });
+            final AlertDialog alertDialog = alert.create();
+            alertDialog.show();
+            
+            return false;
+        }
+    }
+    
+    @Override
+    public void onLocationChanged(final Location location) {
+        
+        String motCle;
+        
+        // loc = true ==> user click on button "autour de moi"
+        if (loc == true) {
+            // enlever le progress bar lance avec l activite
+            myPd_ring.dismiss();
+            
+            // recuperer ma position
+            maposition = new LatLng(location.getLatitude(), location.getLongitude());
+            
+            // get mots clés from field
+            motCle = extractStringFromActivity(getIntent(), "poiKeys");
+            
+            // recuperer la liste des POI du serveur
+            listePOI = searchPOI(motCle, maposition);
+            
+            // Ajouter ma position dans la liste
+            addMyPositionToList(listePOI, maposition);
+            
+            // dessiner les points sur la carte
+            mm.drawPOIOnMap(gMap, listePOI);
+            // new ItineraireTask(this, gMap, maposition, editArrivee).execute();
+            // reinitialiser le parametre
+            loc = false;
+            
+        }
+    }
+    
+    public void addMyPositionToList(final List<LatLng> mylist, final LatLng myPosition) {
+        Log.v("test", "addMyPositionToList");
+        mylist.add(myPosition);
+        Log.v("test", "myPosition" + myPosition);
+    }
+    
+    public String extractStringFromActivity(final Intent intent, final String extratName) {
+        final Bundle bundle = intent.getExtras();
+        return bundle.getString(extratName);
+    }
+    
+    public List<LatLng> searchPOI(final String motCle, final LatLng maposition) {
+        
+        final List<LatLng> listePOI = new ArrayList<LatLng>();
+        Log.v("test", "search POI");
+        // parse mots cle TODO
+        
+        // envoyer la requete de recherche vers le serveur
+        
+        // analyser la reponse et recuperer la liste de
+        
+        // valeurs statiques pour test
+        final LatLng poi1 = new LatLng(36.81808, 10.165733);
+        final LatLng poi2 = new LatLng(36.861219, 10.196975);
+        final LatLng poi3 = new LatLng(36.752089, 10.186676);
+        listePOI.add(poi1);
+        listePOI.add(poi2);
+        listePOI.add(poi3);
+        
+        return listePOI;
+    }
+    
+    @Override
+    public void onProviderDisabled(final String provider) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void onProviderEnabled(final String provider) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void onStatusChanged(final String provider, final int status, final Bundle extras) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // fermer la boite de dialog pour eviter le crash
+        if (myPd_ring != null) {
+            myPd_ring.dismiss();
+        }
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
+    }
+    
+    public void iteniraire(final LatLng poi) {
+        Log.v("test", "calcul iteniraire:");
+        new ItineraireTask(this, gMap, maposition, poi).execute();
+        Log.v("test", "ma position :" + maposition);
+    }
+    
+    @Override
+    public boolean onMarkerClick(final Marker dest) {
+        
+        /* Alert Dialog Code Start*/
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("veuillez choisir votre destination "); // Set Alert dialog title here
+        alert.setMessage("voulez vous confirmer?"); // Message here
+        
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                Log.v("test", "ici marker :");
+                final LatLng poi = dest.getPosition();
+                gMap.clear();
+                mm.drawPOIOnMap(gMap, listePOI);
+                iteniraire(poi);
+                
+            }
+        });
+        
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                
+                // Canceled.
+                dialog.cancel();
+                
+            }
+        });
+        final AlertDialog alertDialog = alert.create();
+        alertDialog.show();
+        
+        return false;
+    }
+    
+}

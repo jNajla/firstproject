@@ -1,0 +1,472 @@
+package com.example.appayn;
+
+import java.io.File;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.adapter.Medias;
+import com.example.adapter.MotCLE;
+import com.example.adapter.PointInteretPublique;
+import com.example.business.DbManager;
+
+public class PointPublique extends Activity implements LocationListener {
+    int cle = 0;
+    double latitude;
+    double longitude;
+    Location location;
+    final static int CAMERA_RESULT = 0;
+    boolean saveposition = false;
+    
+    RelativeLayout linear, linear2, linear21, linear22;
+    EditText edit;
+    int nb = 0;
+    String[] libele = new String[100];
+    long id1, id2, id;
+    int VERTICAL = 1;
+    String nom, description, siteweb, nomImage;
+    int tel, fax;
+    Button buttonAdd, buttonCancel, Ajoutmotcle;
+    public DbManager dbb;
+    ScrollView scroll;
+    int pic = 1;
+    String[] tabpic = new String[2000];
+    boolean take = false;
+    LocationManager locationManager;
+    String[] tab = new String[1000000];
+    ProgressDialog myPd_ring;
+    
+    EditText aaeditTextNomAdd;
+    
+    int idNom = 1, idDescription = 2, idTel = 3, idWebSite = 4, idFax = 5;
+    TableLayout tableLayout, tableLayout2;
+    
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 0 meters
+    
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 0;// 1000 * 0 * 1; // 1 minute
+    
+    @SuppressLint("ResourceAsColor")
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.pointpublique);
+        
+        int k;
+        for (k = 0; k < 100; k++) {
+            libele[k] = "";
+        }
+        scroll = (ScrollView) findViewById(R.id.scrollView1);
+        linear21 = (RelativeLayout) findViewById(R.id.linear21);
+        linear22 = (RelativeLayout) findViewById(R.id.linear22);
+        
+        tableLayout = new TableLayout(this);
+        final TableLayout.LayoutParams lp2 = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                                                                          LayoutParams.WRAP_CONTENT);
+        tableLayout.setLayoutParams(lp2);
+        
+        // Ajout champs dynamiquement
+        addNewRow("                                      ", -1);
+        addNewRow("                                      ", -1);
+        addNewRow("                                      ", -1);
+        addNewRow("    Name        :                            ", idNom);
+        addNewRow("    Description :                            ", idDescription);
+        addNewRow("    Telephone   :                            ", idTel);
+        addNewRow("    Site Web    :                            ", idWebSite);
+        addNewRow("    Fax         :                            ", idFax);
+        
+        linear21.addView(tableLayout);
+        
+        // 2--boutton cancel
+        final Button buttonCancel = (Button) findViewById(R.id.buttonCancel);
+        buttonCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                finish();
+                
+            }
+        });
+        // 3--boutton prendre photo
+        final Button Prendreunephoto = (Button) findViewById(R.id.Prendreunephoto);
+        Prendreunephoto.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                TakePicture();
+                
+            }
+        });
+        
+        // 1--boutton ajouter
+        
+        buttonAdd = (Button) findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                aaeditTextNomAdd = (EditText) findViewById(idNom);
+                nom = ((EditText) findViewById(idNom)).getText().toString();
+                
+                if (nom.compareTo("") == 0) {
+                    aaeditTextNomAdd.setError("champ obligatoire");
+                    
+                    saveposition = false;
+                } else {
+                    aaeditTextNomAdd.setError(null);
+                    if (startGPS()) {
+                        saveposition = true;
+                        
+                        myPd_ring = ProgressDialog.show(PointPublique.this, "Enregistrer ma position",
+                                                        "veuillez attendre la reception de votre position..", true);
+                        myPd_ring.setCancelable(true);
+                        // myPd_ring.setCanceledOnTouchOutside(false);
+                    }
+                    
+                }
+                
+            }
+        });
+        
+        // --boutton mot cle linear1
+        
+        Ajoutmotcle = (Button) findViewById(R.id.Ajoutmotcle);
+        Ajoutmotcle.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                try {
+                    AddChampMotCle();
+                } catch (final Exception e) {
+                    Log.d("test", "Failed to create new edit text: " + e.toString());
+                }
+                
+            }
+            
+        });
+        
+    }
+    
+    @SuppressLint("ResourceAsColor")
+    void addNewRow(final String label, final int idField) {
+        final TextView mytextView = new TextView(this);
+        mytextView.setText(label);
+        mytextView.setTextColor(R.color.orange);
+        if (idField > 0) {
+            mytextView.setPadding(2, 30, 2, 30);
+        }
+        final EditText eedit = new EditText(this);
+        if (idField > 0) {
+            eedit.setId(idField);
+            eedit.setWidth(200);
+            eedit.setHeight(33);
+            eedit.setGravity(17); // 17= center
+            eedit.setBackgroundColor(0xFFFFFFFF);
+            // eedit.setText(textContent);
+        }
+        
+        final TableRow.LayoutParams lp = new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        
+        final TableRow tableRow = new TableRow(this);
+        tableRow.setLayoutParams(lp);
+        tableRow.addView(mytextView);
+        if (idField > 0) {
+            tableRow.addView(eedit);
+            
+        }
+        tableLayout.addView(tableRow);
+        
+    }
+    
+    @SuppressLint("ResourceAsColor")
+    void addNewRow2(final String label, final int idField, final String textContent, final boolean isNew) {
+        final TextView mytextView = new TextView(this);
+        mytextView.setText(label);
+        mytextView.setTextColor(R.color.orange);
+        if (idField > 0) {
+            mytextView.setPadding(2, 30, 2, 30);
+        }
+        final EditText eedit = new EditText(this);
+        if (idField > 0) {
+            eedit.setId(idField);
+            eedit.setWidth(200);
+            eedit.setHeight(33);
+            eedit.setGravity(17); // 17= center
+            eedit.setBackgroundColor(0xFFFFFFFF);
+            eedit.setText(textContent);
+            if (isNew) {
+                libele[cle] = eedit.getText().toString();
+            }
+        }
+        
+        final TableRow.LayoutParams lp = new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        
+        final TableRow tableRow = new TableRow(this);
+        tableRow.setLayoutParams(lp);
+        tableRow.addView(mytextView);
+        if (idField > 0) {
+            tableRow.addView(eedit);
+            
+        }
+        tableLayout2.addView(tableRow);
+        
+    }
+    
+    // gps
+    private boolean startGPS() {
+        
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        // si le gps est active
+        if (enabled) {
+            if (location == null) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                                                       MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Log.v("test", " GPS updating ...");
+                
+            }
+            final boolean enabled2 = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if (enabled2) {
+                if (location == null) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                                                           MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.v("test", " Network updating ...");
+                }
+            }
+            return true;
+        } else {
+            /* Alert Dialog Code Start*/
+            final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("Start GPS"); // Set Alert dialog title here
+            alert.setMessage("Le GPS est desactive!! Voulez vous l'activer?"); // Message here
+            
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int whichButton) {
+                    
+                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    
+                }
+            });
+            
+            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int whichButton) {
+                    
+                    // Canceled.
+                    dialog.cancel();
+                    
+                }
+            });
+            final AlertDialog alertDialog = alert.create();
+            alertDialog.show();
+            
+            return false;
+        }
+    }
+    
+    public void TakePicture() {
+        
+        final String imageFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + nomImage;
+        final File imageFile = new File(imageFilePath);
+        final Uri imageFileUri = Uri.fromFile(imageFile);
+        final Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);
+        startActivityForResult(i, CAMERA_RESULT);
+        
+    }
+    
+    // l'activite appelante est presente pour la photo
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        switch (requestCode) {
+            case CAMERA_RESULT:
+                if (resultCode == RESULT_OK) {
+                    final String nomEnseigne = ((EditText) findViewById(idNom)).getText().toString();
+                    nomImage = nomEnseigne + pic + ".jpg";
+                    tabpic[pic] = nomImage;
+                    pic++;
+                    Log.v("test", ":nom de l'image" + nomImage);
+                    take = true;
+                }
+                
+                break;
+        
+        }
+    }
+    
+    @SuppressLint("NewApi")
+    public void AddChampMotCle() {
+        
+        final TableLayout.LayoutParams lp2 = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                                                                          LayoutParams.WRAP_CONTENT);
+        tableLayout2 = new TableLayout(this);
+        
+        tableLayout2.setLayoutParams(lp2);
+        
+        // read all fileds
+        int j;
+        for (j = 0; j < cle; j++) {
+            libele[j] = ((EditText) findViewById(j + 1000)).getText().toString();
+        }
+        
+        // remove all view
+        linear22.removeAllViews();
+        
+        // insert existed fields
+        int i;
+        for (i = 0; i < cle; i++) {
+            addNewRow2("Mot cle " + (i + 1) + ":", i + 1000, libele[i], false);
+        }
+        // add new field
+        addNewRow2("Mot cle " + (i + 1) + ":", cle + 1000, libele[cle], true);
+        linear22.addView(tableLayout2);
+        cle++;
+        
+    }
+    
+    @Override
+    public void onLocationChanged(final Location location) {
+        if (saveposition == true && location != null && location.getAccuracy() < 100) {
+            
+            myPd_ring.dismiss();
+            Log.v("test", "  :position will be saved  ");
+            // recuperer la position GPS
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            getAllDataPOI();
+            savePublicPoi(-1, nom, tel, description, fax, siteweb, latitude, longitude, tab, tabpic);
+            finish();
+            
+        }
+        
+    }
+    
+    public void getAllDataPOI() {
+        /****************************** Get all data POI *********************************************/
+        
+        nom = ((EditText) findViewById(idNom)).getText().toString();
+        description = ((EditText) findViewById(idDescription)).getText().toString();
+        final String tel1 = ((EditText) findViewById(idTel)).getText().toString();
+        if (!tel1.equals("")) {
+            tel = Integer.parseInt(tel1);
+        } else {
+            tel = 0;
+        }
+        final String fax1 = ((EditText) findViewById(idFax)).getText().toString();
+        if (!fax1.equals("")) {
+            fax = Integer.parseInt(fax1);
+        } else {
+            fax = 0;
+        }
+        siteweb = ((EditText) findViewById(idWebSite)).getText().toString();
+    }
+    
+    public void savePublicPoi(final int idpoi, final String nom, final int tel, final String description,
+                              final int fax, final String siteweb, final Double latitude, final Double longitude,
+                              final String[] motscle, final String[] tabpic) {
+        
+        /****************************** creer la base de donnee si necessaire *********************************************/
+        dbb = new DbManager(this);
+        
+        /****************************** last id POI *********************************************************************/
+        id1 = dbb.lastId1();
+        Log.v("test", "dernier id Enseigne  : " + id1);
+        /****************************** last mot cle *********************************************************************/
+        id2 = dbb.lastId2();
+        Log.v("test", "dernier id mot cle  : " + id2);
+        Log.v("test", "nb des mots cles : " + nb);
+        
+        /****************************** Add Entry POI ********************************************************************/
+        dbb.AddEntryEnseigne(new PointInteretPublique(-1, nom, tel, description, fax, siteweb, latitude, longitude));
+        id = dbb.lastId1();
+        for (int j = 1; j < pic; j++) {
+            if (take == true) {
+                dbb.AddEntryMedia(new Medias(id, tabpic[j]));
+            }
+        }
+        
+        /****************************** Add keys words ********************************************************************/
+        for (int i = 1000; i < nb + 1000; i++) {
+            tab[i] = ((EditText) findViewById(i)).getText().toString();
+            Log.v("test", "tab  : " + tab[i]);
+            dbb.AddEntrymotcle(new MotCLE(tab[i]));
+        }
+        
+        /****************************** Add table association **************************************************************/
+        id1 = id1 + 1;
+        for (int count = 1; count <= nb; count++) {
+            id2 = id2 + 1;
+            Log.v("test", "ajouter id enseigne ici" + id1);
+            Log.v("test", "ajouter id mot cle ici" + id2);
+            dbb.AddEntryAssoc(id1, id2);
+            
+        }
+        
+        /****************************** Reinitialiser ********************************************************************/
+        saveposition = false;
+        
+        /****************************** Toast ********************************************************************/
+        final Toast toast = Toast.makeText(PointPublique.this, "Votre position est sauvegardée", Toast.LENGTH_SHORT);
+        toast.show();
+        
+        /****************************** close mydb ********************************************************************/
+        dbb.closeMydb();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        
+        // fermer la boite de dialog pour eviter le crash
+        if (myPd_ring != null) {
+            myPd_ring.dismiss();
+        }
+        
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
+        
+    }
+    
+    @Override
+    public void onProviderDisabled(final String provider) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void onProviderEnabled(final String provider) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void onStatusChanged(final String provider, final int status, final Bundle extras) {
+        // TODO Auto-generated method stub
+        
+    }
+}

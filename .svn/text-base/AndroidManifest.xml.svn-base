@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.appayn"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
+
+        <permission
+        android:name="com.example.ayn.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+        
+	 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+     <uses-permission android:name="android.permission.SEND_SMS"/>
+     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>  
+     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission  android:name="com.example.appayn.permission.MAPS_Receive"/>
+       <uses-feature 
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ayn"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.example.appayn.MainActivity"
+            android:label="@string/app_name" 
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+       
+          </activity>
+           <activity 
+            android:name="PointPrive" 
+            android:label="PointPrive"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity 
+            android:name="BootReceiver" 
+            android:label="BootReceiver">
+        </activity>
+         <activity 
+            android:name="PointPublique" 
+            android:label="PointPublique"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        
+         <activity 
+            android:name="EnvoyerPosition" 
+            android:label="EnvoyerPosition"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity 
+            android:name="Afficher" 
+            android:label="Afficher">
+        </activity>
+        <activity 
+            android:name="dialogpositionreceive" 
+            android:label="dialogpositionreceive">
+        </activity>
+      <activity 
+            android:name="SearchEntries" 
+            android:label="SearchEntries">
+        </activity>
+        <activity 
+            android:name="AutourMoi" 
+            android:label="AutourMoi">
+        </activity>
+        <activity 
+            android:name="SearchByAddress" 
+            android:label="SearchByAddress"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity 
+            android:name="PositionSurCarte" 
+            android:label="PositionSurCarte">
+        </activity>
+         <activity 
+            android:name="ManageDataFromSMS" 
+            android:label="ManageDataFromSMS">
+        </activity>
+        
+      <receiver android:name="recevoirPosition">
+          <intent-filter>
+              <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+              <action android:name="LAUNCHED"/>
+              <action android:name="CLOSED"/>
+          </intent-filter>
+      </receiver>
+      
+      <meta-data
+        android:name="com.google.android.maps.v2.API_KEY"
+        android:value="AIzaSyBseX5jqAZ0dhIH6-r_9l87MM9LBZ9rv-I"/>
+    <uses-library android:name="com.google.android.maps"/>
+    </application>
+
+</manifest>

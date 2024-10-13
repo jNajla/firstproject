@@ -1,0 +1,228 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/relative3"
+        android:layout_width="match_parent"
+        android:layout_height="162dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bachground3"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/editsearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/chercher"
+            android:layout_below="@+id/quoi"
+            android:layout_toLeftOf="@+id/chercher"
+            android:background="@android:color/white"
+            android:inputType="text"
+            android:onClick="search" >
+
+        </EditText>
+
+        <Button
+            android:id="@+id/chercher"
+            android:layout_width="36dp"
+            android:layout_height="34dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/quoi"
+            android:background="@drawable/btnsearch"
+            android:contentDescription="@+String/image" />
+
+        <TextView
+            android:id="@+id/quoi"
+            android:layout_width="77dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/quoi_"
+            android:textStyle="bold|italic" />
+
+        <Button
+            android:id="@+id/idK"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/quoi"
+            android:layout_marginBottom="27dp"
+            
+            android:background="@drawable/autourmoi" />
+
+        <Button
+            android:id="@+id/idL"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_alignBaseline="@+id/idK"
+            android:layout_alignBottom="@+id/idK"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ville" />
+
+        <Button
+            android:id="@+id/idM"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_alignBaseline="@+id/idL"
+            android:layout_alignBottom="@+id/idL"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="21dp"
+            android:layout_marginLeft="32dp"
+            android:background="@drawable/carte" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relative3"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/background2"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/idE"
+            
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/idD"
+            android:layout_alignTop="@+id/idD"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/pharmacie" />
+
+        <Button
+            android:id="@+id/idF"
+            
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/idE"
+            android:layout_alignTop="@+id/idE"
+            android:layout_marginLeft="37dp"
+            android:layout_toRightOf="@+id/idE"
+            android:background="@drawable/supermarche" />
+
+        <ImageView
+            android:id="@+id/imgtxt"
+            android:layout_width="216dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/label"
+            android:contentDescription="@+String/txt" />
+
+        <Button
+            android:id="@+id/idH"
+            android:layout_width="48dp"
+            android:layout_height="42dp"
+            android:layout_alignBaseline="@+id/idG"
+            android:layout_alignBottom="@+id/idG"
+            android:layout_alignLeft="@+id/idF"
+            android:background="@drawable/hopital" />
+
+        <Button
+            android:id="@+id/idC"
+            android:layout_width="90dp"
+            android:layout_height="70dp"
+            android:layout_alignBaseline="@+id/idA"
+            android:layout_alignBottom="@+id/idA"
+            android:layout_alignLeft="@+id/idI"
+            android:background="@drawable/mecanicien" />
+
+        <Button
+            android:id="@+id/idB"
+
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignLeft="@+id/idH"
+            android:layout_below="@+id/imgtxt"
+            android:layout_marginTop="17dp"
+            android:background="@drawable/coffee" />
+
+        <Button
+            android:id="@+id/idA"
+            
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/idB"
+            android:layout_alignLeft="@+id/idE"
+            android:background="@drawable/restau" />
+
+        <Button
+            android:id="@+id/idI"
+            
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignLeft="@+id/idD"
+            android:layout_below="@+id/idC"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/taxi" />
+
+        <Button
+            android:id="@+id/idG"
+            android:layout_width="48dp"
+            android:layout_height="42dp"
+            android:layout_alignBaseline="@+id/idI"
+            android:layout_alignBottom="@+id/idI"
+            android:layout_alignLeft="@+id/idA"
+            android:background="@drawable/hotel" />
+
+        <Button
+            android:id="@+id/idD"
+            android:layout_width="48dp"
+            android:layout_height="42dp"
+            android:layout_alignLeft="@+id/imgtxt"
+            android:layout_below="@+id/idI"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/pizza" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relative2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:background="@drawable/background1"
+        android:orientation="horizontal"
+        android:showDividers="none" >
+
+        <Button
+            android:id="@+id/id2"
+
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/add"
+            android:height="@android:dimen/app_icon_size" />
+
+        <Button
+            android:id="@+id/id1"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="36dp"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/id2"
+            android:background="@drawable/receive" />
+
+        <Button
+            android:id="@+id/id3"
+            
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/id2"
+            android:background="@drawable/send" />
+    </RelativeLayout>
+
+</RelativeLayout>

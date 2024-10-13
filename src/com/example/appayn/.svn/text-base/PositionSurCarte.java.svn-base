@@ -1,0 +1,212 @@
+package com.example.appayn;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class PositionSurCarte extends Activity implements OnMapClickListener, OnMapLongClickListener,
+    OnMarkerClickListener {
+    private GoogleMap gMap;
+    LatLng maposition, location;
+    final LatLng CENTER = new LatLng(36.767148, 10.284319);
+    String motCle;
+    MapManager mm;
+    List<LatLng> listePOI;
+    ProgressDialog myPd_ring;
+    LocationManager locationManager;
+    LatLng center;
+    
+    @Override
+    @SuppressLint("NewApi")
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.map_activity);
+        
+        // map
+        gMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final Location lastpos = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (lastpos != null) {
+            center = new LatLng(lastpos.getLatitude(), lastpos.getLongitude());
+        } else {
+            Log.v("test", "toto");
+            center = new LatLng(36.81808, 10.165733);
+        }
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 10));
+        
+        // Zoom in the Google Map
+        // gMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        
+        // ecoute map
+        gMap.setOnMapClickListener(this);
+        
+        // ecoute sur marker
+        gMap.setOnMarkerClickListener(this);
+        
+        // ecoute long clique sur map
+        gMap.setOnMapLongClickListener(this);
+        mm = new MapManager();
+    }
+    
+    @Override
+    public void onMapLongClick(final LatLng point) {
+        
+        // add marker
+        gMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
+        
+        // affecter la position -->globale
+        maposition = point;
+        
+        // open dialog confirmation
+        openDialogToConfirmPosition();
+        
+    }
+    
+    public void openDialogToConfirmPosition() {
+        
+        /* Alert Dialog Code Start */
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("confirmation de votre position"); // Set Alert dialog title
+        // here
+        alert.setMessage("Merci de confirmer votre position source!"); // Message
+                                                                       // here
+        
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                
+                // get mots clés
+                motCle = extractStringFromActivity(getIntent(), "POI");
+                
+                // progress bar : attend la reception des pois
+                myPd_ring = ProgressDialog.show(PositionSurCarte.this, "Recherche des poi",
+                                                "veuillez attendre la reception des poi..", true);
+                myPd_ring.setCancelable(true);
+                // myPd_ring.setCanceledOnTouchOutside(false);
+                
+                // recuperer la liste des POI
+                listePOI = searchPOI(motCle, maposition);
+                
+                // Ajouter ma position dans la liste
+                addMyPositionToList(listePOI, maposition);
+                
+                // dessiner les points sur la carte
+                
+                mm.drawPOIOnMap(gMap, listePOI);
+            }
+        });
+        
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                // Canceled.
+                dialog.cancel();
+                gMap.clear();
+            }
+        });
+        final AlertDialog alertDialog = alert.create();
+        alertDialog.show();
+    }
+    
+    public void addMyPositionToList(final List<LatLng> mylist, final LatLng myPosition) {
+        mylist.add(myPosition);
+        myPd_ring.dismiss();
+    }
+    
+    public String extractStringFromActivity(final Intent intent, final String extratName) {
+        final Bundle bundle = intent.getExtras();
+        return bundle.getString(extratName);
+    }
+    
+    public List<LatLng> searchPOI(final String motCle, final LatLng maposition) {
+        
+        final List<LatLng> listePOI = new ArrayList<LatLng>();
+        
+        // parse mots cle TODO
+        
+        // envoyer la requete de recherche vers le serveur
+        
+        // analyser la reponse et recuperer la liste de
+        
+        // valeurs statiques pour test
+        final LatLng poi1 = new LatLng(35.570494, 10.820332);
+        final LatLng poi2 = new LatLng(35.633581, 10.756962);
+        final LatLng poi3 = new LatLng(35.681597, 10.728229);
+        listePOI.add(poi1);
+        listePOI.add(poi2);
+        listePOI.add(poi3);
+        
+        return listePOI;
+    }
+    
+    @Override
+    public void onMapClick(final LatLng point) {
+        
+        gMap.animateCamera(CameraUpdateFactory.newLatLng(point));
+        
+    }
+    
+    @Override
+    public boolean onMarkerClick(final Marker dest) {
+        /* Alert Dialog Code Start*/
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("veuillez choisir votre destination"); // Set Alert dialog title here
+        alert.setMessage("voulez vous confirmer?"); // Message here
+        
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                final LatLng poi = dest.getPosition();
+                gMap.clear();
+                mm.drawPOIOnMap(gMap, listePOI);
+                iteniraire(poi);
+                
+            }
+        });
+        
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                
+                // Canceled.
+                dialog.cancel();
+                
+            }
+        });
+        final AlertDialog alertDialog = alert.create();
+        alertDialog.show();
+        
+        return false;
+    }
+    
+    /*// calcul itineraire when i choose poi
+    gMap.clear();
+    new ItineraireTask(this, gMap, maposition, marker.getPosition()).execute();
+    return false;*/
+    
+    public void iteniraire(final LatLng poi) {
+        new ItineraireTask(this, gMap, maposition, poi).execute();
+    }
+    
+}

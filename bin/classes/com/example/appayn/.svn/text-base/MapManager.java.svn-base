@@ -1,0 +1,64 @@
+package com.example.appayn;
+
+import java.util.List;
+
+import android.util.Log;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MapManager {
+    public MapManager() {
+        
+    }
+    
+    public void drawPOIOnMap(final GoogleMap gMap, final List<LatLng> listePOI) {
+        
+        int localCounter = 0;
+        Log.v("test", "centerPOI");
+        Double minLat = Double.MAX_VALUE;
+        Double maxLat = Double.MIN_VALUE;
+        Double minLon = Double.MAX_VALUE;
+        Double maxLon = Double.MIN_VALUE;
+        
+        for (final LatLng item : listePOI) {
+            localCounter++;
+            final Double lat = item.latitude;
+            final Double lon = item.longitude;
+            
+            maxLat = Math.max(lat, maxLat);
+            minLat = Math.min(lat, minLat);
+            maxLon = Math.max(lon, maxLon);
+            minLon = Math.min(lon, minLon);
+            
+            final MarkerOptions marker = new MarkerOptions();
+            marker.position(item);
+            
+            if (localCounter < listePOI.size()) {
+                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                marker.title("poi");
+            } else {
+                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                marker.title("Ma position");
+            }
+            gMap.addMarker(marker);
+            // gMap.addMarker(new MarkerOptions().title("poi").position(item));
+            
+        }
+        
+        final LatLng southWestLatLon = new LatLng(minLat, minLon);
+        final LatLng northEastLatLon = new LatLng(maxLat, maxLon);
+        centerMap(gMap, southWestLatLon, northEastLatLon);
+    }
+    
+    public void centerMap(final GoogleMap gMap, final LatLng sw, final LatLng nth) {
+        
+        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(sw, nth), 50));
+        
+    }
+    
+}
